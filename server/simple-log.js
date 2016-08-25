@@ -12,5 +12,11 @@ module.exports = (tag) => ({
         : () => undefined,
     wow: lastArg(console.log.bind(console), '^'+tag),
     err: lastArg(console.error.bind(console), '^'+tag),
-    error: (err, msg) => console.error(msg || '', err, (err && err.stack) ? err.stack: '', '^'+tag)
+    error: (err, msg) => {
+        var parts = []
+        msg && parts.push(msg)
+        err && err.stack && parts.push(enabled ? err.stack : err.stack.split(serverRoot).join("*"))
+        parts.push('^'+tag)
+        console.error(...parts)
+    }
 })

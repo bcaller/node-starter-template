@@ -7,16 +7,22 @@ var express = require('express')
 	, compression = require('compression')
     , fs = require('fs')
     , pathify = (path => ((f) => path.join(__dirname, f)))(require("path"))
+    , PROD = app.get('env') == 'production'
 
 app.set('port', (process.env.PORT || 3000));
 
-app.use(gzipStatic(pathify(process.env.PROD ? '../dist' : '../client')));
+app.use(gzipStatic(pathify(PROD ? '../dist' : '../client')));
 
 app.use(compression())
 
 app.get('/x', (req, res) => {
     res.send('Hello World!')
 });
+
+app.use((err, req, res, next) => {
+    res.status(err.status || 500)
+    next(err)
+})
 
 var server = app.listen(app.get('port'), () => {
     var address = server.address()
